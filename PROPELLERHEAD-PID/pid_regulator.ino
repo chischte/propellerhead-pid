@@ -1,8 +1,5 @@
 int pid_regulator()
 {
-
-  
-
   //*****************************************************************************
   //CALCULATION OF BASIC VARIABLES FOR THE REGULATOR
   //*****************************************************************************
@@ -29,7 +26,7 @@ int pid_regulator()
   RPM_I = limiter(RPM_I, -RPM_MAX, RPM_MAX);
   RPM_D = limiter(RPM_D, -RPM_MAX, RPM_MAX);
 
-//RPM_D_SMOOTHED
+  //RPM_D_SMOOTHED
 
   RPM_SUM = RPM_P + RPM_I + RPM_D;
 

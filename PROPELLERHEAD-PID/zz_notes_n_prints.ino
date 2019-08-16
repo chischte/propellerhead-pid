@@ -122,8 +122,8 @@ int serial_prints()
   //*****************************************************************************
   //*****************************************************************************
   int GYRO_ANGLE_INT = GYRO_ANGLE;
-  
-    if (millis() - serialprinttimer > 50)
+
+  if (millis() - serialprinttimer > 50)
   {
     Serial.flush();
 

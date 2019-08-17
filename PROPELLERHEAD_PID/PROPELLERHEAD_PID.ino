@@ -2,10 +2,10 @@
 * *****************************************************************************
 * PROPELLERHEAD_PID
 * *****************************************************************************
-* Program to control a propeller test rig wit a PID regulator
+* Program to control a propeller test rig with a PID regulator
 * *****************************************************************************
 * Michael Wettstein
-* Februar 2018, Zürich
+* Februar 2018, Zurich
 * *****************************************************************************
 */
 

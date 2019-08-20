@@ -173,7 +173,7 @@ void loop() {
     //***************************************************************************
     // serial_prints(); //ACTIVATE / DEACTIVATE SERIAL PRINTS FOR MONITORING AND DEBUGGING
     //***************************************************************************
-    //Stopwatch two read the length of a programcycle
+    //STOPWATCH TO READ THE LENGTH OF A PROGRAMCYCLE
     //***************************************************************************
     /*
      long runtime = micros() - stopwatch;

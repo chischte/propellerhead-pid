@@ -12,7 +12,7 @@
 //*****************************************************************************
 //PRE-SETUP SECTION / PIN LAYOUT
 //*****************************************************************************
-#include<Wire.h>
+#include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_FXAS21002C.h>
 #include <Adafruit_FXOS8700.h>

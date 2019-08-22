@@ -10,7 +10,7 @@ void get_sensor_values()
   Wire.write(0x03);  // starting with register 0x03
   Wire.endTransmission(false);
   Wire.requestFrom(MPU_addr, 2, true); // request a total of 14 registers
-  ACC_GRAVITY_RAW = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
+  acc_gravity_raw = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
 
       //*****************************************************************************
       //I2C COMMUNICATION - GET RAW SENSOR VALUES FROM FXAS21002C (GYRO)
@@ -21,7 +21,7 @@ void get_sensor_values()
   Wire.write(0x01); // starting with register 0x03//Library: Adafruit_FXAS21002C.h
   Wire.endTransmission(false);
   Wire.requestFrom(MPU_addr, 2, true); // request a total of 14 registers
-  GYRO_RAW = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
+  gyro_raw = Wire.read() << 8 | Wire.read(); // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
 
       //*****************************************************************************
       //CYCLESTOPWATCH RESULTS FOR THE MPU_6050 SECTION Wire.setClock(100000)
@@ -41,27 +41,27 @@ void get_sensor_values()
   //*****************************************************************************
   //*****************************************************************************
 
-  float ACC_GRAVITY_MAX_G_VALUE = 8500; //measured value for full G-force
+  float acc_gravity_max_g_value = 8500; //measured value for full G-force
 
   //LOW PASS FILTERING / SMOOTHING ACCELERATOR VALUESs
   //*****************************************************************************
-  if (ACC_GRAVITY_RAW == ACC_GRAVITY_RAW) //FILTER OUT NaN's - ONLY NaN's DON'T PASS THIS TEST!
+  if (acc_gravity_raw == acc_gravity_raw) //FILTER OUT NaN's - ONLY NaN's DON'T PASS THIS TEST!
   {
-    if (ACC_GRAVITY_RAW != 0) //zeros can be caused by sensor errors
+    if (acc_gravity_raw != 0) //zeros can be caused by sensor errors
     {
-      int ACC_SMOOTHCOUNTER = 3; //use this value to adapt smoothing
-      ACC_GRAVITY_LPF = (ACC_GRAVITY_LPF * (ACC_SMOOTHCOUNTER - 1)
-          + ACC_GRAVITY_RAW) / ACC_SMOOTHCOUNTER;
+      int acc_smoothcounter = 3; //use this value to adapt smoothing
+      acc_gravity_lpf = (acc_gravity_lpf * (acc_smoothcounter - 1)
+          + acc_gravity_raw) / acc_smoothcounter;
     }
   }
   //CONVERT ACCELERATOR VALUES TO ANGLE // unit [°/10] to avoid float
   //*****************************************************************************
-  GRAVITY_ANGLE_LPF_NEW = asin(ACC_GRAVITY_LPF / (ACC_GRAVITY_MAX_G_VALUE))
+  gravity_angle_lpf_new = asin(acc_gravity_lpf / (acc_gravity_max_g_value))
       * -65; //last factor and addend are experimentally determined
 
-  if (GRAVITY_ANGLE_LPF_NEW == GRAVITY_ANGLE_LPF_NEW) //FILTER OUT NaN's - ONLY NaN's DON'T PASS THIS TEST!
+  if (gravity_angle_lpf_new == gravity_angle_lpf_new) //FILTER OUT NaN's - ONLY NaN's DON'T PASS THIS TEST!
   {
-    GRAVITY_ANGLE_LPF = GRAVITY_ANGLE_LPF_NEW;
+    gravity_angle_lpf = gravity_angle_lpf_new;
   }
 
   //X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X/X
@@ -79,29 +79,29 @@ void get_sensor_values()
 
   //CONVERT SENSOR UNIT TO ANGULAR SPEED UNIT [°/s]
   //*****************************************************************************
-  GYRO_ANGULAR_SPEED = GYRO_RAW * -0.0001 * 90;
+  gyro_angular_speed = gyro_raw * -0.0001 * 90;
   //the last factor is to adjust to the desired the unit //check value via calculated angle
 
   //SMOOTHING OF GYRO ANGULAR SPEED VALUES FOR THE PID REGULATOR (VIBRATIONS!)
   //*****************************************************************************
-  int GYRO_SMOOTHCOUNTER = 1; //use this value to adapt smoothing
-  GYRO_ANGULAR_SPEED_SMOOTHED = (GYRO_ANGULAR_SPEED_SMOOTHED
-      * (GYRO_SMOOTHCOUNTER - 1) + GYRO_ANGULAR_SPEED) / GYRO_SMOOTHCOUNTER;
+  int gyro_smoothcounter = 1; //use this value to adapt smoothing
+  gyro_angular_speed_smoothed = (gyro_angular_speed_smoothed
+      * (gyro_smoothcounter - 1) + gyro_angular_speed) / gyro_smoothcounter;
 
   //CALCULATING ANGLE: NEW_ANGLE = OLD_ANGLE + (ANGULAR_SPEED*DELTA_TIME)
   //*****************************************************************************
   transmission_delta_t = micros() - transmission_stopwatch;
-  GYRO_ANGLE = GYRO_ANGLE
-      + (GYRO_ANGULAR_SPEED * (transmission_delta_t * 0.000001));
+  gyro_angle = gyro_angle
+      + (gyro_angular_speed * (transmission_delta_t * 0.000001));
   transmission_stopwatch = micros(); //RESTART THE CYCLE STOPWATCH
 
   //THE GYRO ANGLE SHOULD SLOWLY DECAY TO THE VALUE OF THE ACCELERATOR ANGLE (AUTOCALIBRATION)
   //*****************************************************************************
-  int GYRO_CALIBRATION_SMOOTHVALUE = 500; //higher value = slower calibration
+  int gyro_calibration_smoothvalue = 500; //higher value = slower calibration
 
-  GYRO_ANGLE_CALIBRATED = (GYRO_ANGLE * (GYRO_CALIBRATION_SMOOTHVALUE - 1)
-      + (GRAVITY_ANGLE_LPF)) / GYRO_CALIBRATION_SMOOTHVALUE;
-  GYRO_ANGLE = GYRO_ANGLE_CALIBRATED; //update the angle value for the next loop
+  gyro_angle_calibrated = (gyro_angle * (gyro_calibration_smoothvalue - 1)
+      + (gravity_angle_lpf)) / gyro_calibration_smoothvalue;
+  gyro_angle = gyro_angle_calibrated; //update the angle value for the next loop
 
   Serial.flush();
 }

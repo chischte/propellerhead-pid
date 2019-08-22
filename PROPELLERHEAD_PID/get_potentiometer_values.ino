@@ -18,7 +18,7 @@ void get_potentiometer_values()
     ki_factor = analogRead(i_valuepot);
     if (ki_factor <= 1)
     {
-      RPM_I = 0;  //reset I-value
+      rpm_i = 0;  //reset i-value
     }
     ki_factor = map(ki_factor, 0, 1023, 0, ki_max);
     break;

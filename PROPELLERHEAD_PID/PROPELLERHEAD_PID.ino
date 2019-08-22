@@ -55,21 +55,21 @@ int kp_factor;
 int ki_max = 8000; //[RPM /(°/10)/s] value to scale the regulator potentiometer
 int ki_factor;
 int kd_max = 3000; //[RPM /((°/10)/s))] value to scale the regulator potentiometer
-int RPM_MAX = 10000; // just a rough guess
+int rpm_max = 10000; // just a rough guess
 int manual_throttle;
-int motor_pwm;
 int min_pwm_manual = 1200; // 1270 motor brake // 1282 motor start
 int min_pwm_autopilot = 1200;
 int max_pwm = 1540; //1450 sufficient // 1570 limit, faster sounds "unhealthy"
+unsigned int motor_pwm;
 
 //FOR ESC PROGRAMMING ONLY:
 //int min_pwm = 1000; // 1220 Motor off // 1245 motor start
 //int max_pwm = ESC_pwm_period;
 
-long RPM_P;
-long RPM_I;
-float RPM_D;
-long RPM_SUM;
+long rpm_p;
+long rpm_i;
+float rpm_d;
+long rpm_sum;
 
 unsigned long cyclestopwatch;
 unsigned long serialprinttimer;
@@ -82,19 +82,19 @@ unsigned long transmission_delta_t;
 unsigned long pid_delta_t;
 unsigned long newtime;
 
-float ACC_GRAVITY_RAW;
-float GRAVITY_ANGLE_LPF_NEW;
-float GYRO_RAW;
+float acc_gravity_raw;
+float gravity_angle_lpf_new;
+float gyro_raw;
 float stopwatch = micros();
 float measured_angle;
-float GYRO_ANGLE;
-float GYRO_ANGLE_CALIBRATED;
+float gyro_angle;
+float gyro_angle_calibrated;
 float cosinus_factor;
-float GYRO_ANGULAR_SPEED_SMOOTHED;
+float gyro_angular_speed_smoothed;
 float kd_factor;
-float ACC_GRAVITY_LPF;
-float GRAVITY_ANGLE_LPF;
-float GYRO_ANGULAR_SPEED;
+float acc_gravity_lpf;
+float gravity_angle_lpf;
+float gyro_angular_speed;
 float angle_error;
 
 //*****************************************************************************
@@ -176,7 +176,10 @@ void loop()
   get_potentiometer_values();
 
   //***************************************************************************
-  // serial_prints(); //ACTIVATE / DEACTIVATE SERIAL PRINTS FOR MONITORING AND DEBUGGING
+  //ACTIVATE / DEACTIVATE SERIAL PRINTS FOR MONITORING AND DEBUGGING
+  //***************************************************************************
+  //serial_prints();
+
   //***************************************************************************
   //STOPWATCH TO READ THE LENGTH OF A PROGRAMCYCLE
   //***************************************************************************

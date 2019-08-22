@@ -7,9 +7,9 @@ void toggle_autopilot()
   {
     pid_startupmode = true; //start PID with gyro angle turned off;
     autopilot = true;
-    RPM_P = 0;
-    RPM_I = 0; //reset RPM_I sum
-    RPM_SUM = 0;
+    rpm_p = 0;
+    rpm_i = 0; //reset rpm_i sum
+    rpm_sum = 0;
     while (digitalRead(toggle_knob) == LOW) //LOW=pushed //keep in loop until button is released
     {
       digitalWrite(ESC_pin, LOW); //keep motor switched off

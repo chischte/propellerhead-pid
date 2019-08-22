@@ -114,7 +114,6 @@ void serial_prints()
   //SERIAL PRINT SECTION
   //*****************************************************************************
   //*****************************************************************************
-  int GYRO_ANGLE_INT = GYRO_ANGLE;
 
   if (millis() - serialprinttimer > 50)
   {
@@ -127,54 +126,6 @@ void serial_prints()
     Serial.print(0);
     Serial.print(",");
 
-    //Serial.print(ACC_GRAVITY_RAW);
-    //Serial.print(",");
-    //Serial.print(ACC_GRAVITY_LPF);
-    //Serial.print(",");
-    //Serial.print(GRAVITY_ANGLE_LPF);
-    //Serial.print(",");
-
-    //Serial.print(GYRO_RAW);
-    //Serial.print(",");
-    //Serial.print(GYRO_ANGULAR_SPEED);
-    //Serial.print(",");
-    //Serial.print(GYRO_ANGULAR_SPEED_SMOOTHED);
-    //Serial.print(",");
-    //Serial.print(GYRO_ANGLE);
-    //Serial.print(",");
-    Serial.print(GYRO_ANGLE_CALIBRATED);
-    //Serial.print(",");
-    //Serial.print(GYRO_ANGLE_INT);//INT VALUE FOR FASTER SERIAL PRINT
-    //Serial.print(",");
-
-    //Serial.print(",");
-    //Serial.println(transmission_delta_t);
-    //Serial.print(",");
-
-    //Serial.print(analogRead(d_valuepot));//manual_throttle_pot //p_valuepot//
-    //Serial.print(",");
-    //Serial.print(digitalRead(toggle_knob));//manual_throttle_pot //p_valuepot//
-    //Serial.print(",");
-    //Serial.print(",");
-    //Serial.print(angle_error);
-    //Serial.print(",");
-    //Serial.print(cosinus_factor);
-
-    //Serial.print(GYRO_RAW);
-    //Serial.print(",");
-    //Serial.print(RPM_SUM / 100);
-    //Serial.print(",");
-    //Serial.print(RPM_P);
-    //Serial.print(",");
-    //Serial.print(RPM_D/100);
-    //Serial.print(",");
-    //Serial.print(RPM_D);
-    //Serial.print(",");
-    //Serial.print(motor_pwm);
-    //Serial.print(",");
-    //Serial.print(pid_delta_t);
-    //Serial.print(",");
-    //Serial.println(e);
 
     serialprinttimer = millis();
     /*

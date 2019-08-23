@@ -36,38 +36,37 @@
 
 // KNOBS AND POTENTIOMETERS:
 const byte TOGGLE_KNOB = 4;
-const byte MANUAL_THROTTLE_POT = A0 // potentiometer control motorspeed in manual mode
-const byte P_VALUE_POT = A6
-const byte I_VALUE_POT = A1
-const byte D_VALUE_POT = A2
+const byte MANUAL_THROTTLE_POT = A0; // potentiometer control motorspeed in manual mode
+const byte P_VALUE_POT = A6;
+const byte I_VALUE_POT = A1;
+const byte D_VALUE_POT = A2;
+
+byte oneAtATime = 1;
 
 boolean autopilot = false;
 boolean pidStartupMode = true;
 
-byte oneAtATime = 1;
-
-int setpoint = 0; //setpoint of the regulator is 0° //value slightli adapted because of sensor alignment
+int setpoint = 0; //setpoint of the regulator is 0° //value slightly adapted because of sensor alignment
 int speedlimitLow = -200; // set max downwards speed limit [°/s]
-int Kp_Max = 1500; // [RPM /(°/10)] value to scale the regulator potentiometer
-int Kp_Factor;
-int Ki_Max = 8000; // [RPM /(°/10)/s] value to scale the regulator potentiometer
-int Ki_Factor;
-int Kd_Max = 3000; // [RPM /((°/10)/s))] value to scale the regulator potentiometer
-int rpm_Max = 10000; // just a rough guess
+int KpMax = 1500; // [RPM /(°/10)] value to scale the regulator potentiometer
+int KpFactor;
+int KiMax = 8000; // [RPM /(°/10)/s] value to scale the regulator potentiometer
+int KiFactor;
+int KdMax = 3000; // [RPM /((°/10)/s))] value to scale the regulator potentiometer
+int rpmMax = 10000; // just a rough guess
 int manualThrottle;
 int minPwmManual = 1200; // 1270 motor brake // 1282 motor start
 int minPwmAutopilot = 1200;
 int maxPwm = 1540; // 1450 sufficient // 1570 limit, faster sounds "unhealthy"
-unsigned int motor_pwm;
+unsigned int motorPwm;
 
 // FOR ESC PROGRAMMING ONLY:
 // int min_pwm = 1000; // 1220 Motor off // 1245 motor start
 // int maxPwm = ESC_pwm_period;
 
-long rpm_P;
-long rpm_I;
-float rpm_D;
-long rpm_Sum;
+long rpmP;
+long rpmI;
+long rpmSum;
 
 unsigned long cycleStopwatch;
 unsigned long serialPrintTimer;
@@ -79,6 +78,7 @@ unsigned long transmissionDeltaT;
 unsigned long pidDeltaT;
 unsigned long newTime;
 
+float rpmD;
 float accGravityRaw;
 float gravityAngleLpfNew;
 float gyroRaw;
@@ -87,7 +87,7 @@ float gyroAngle;
 float gyroAngleCalibrated;
 float cosinusFactor;
 float gyroAngularSpeedSmoothed;
-float Kd_Factor;
+float KdFactor;
 float accGravityLpf;
 float gravityAngleLpf;
 float gyroAngularSpeed;
@@ -159,11 +159,11 @@ void loop()
 
   motorPulseStopwatch = micros();
   digitalWrite(ESC_PIN, HIGH);
-  ToggleAutopilot(); // SWITCH TO DESIRED OPERATION MODE
-  GetSensorValues(); // GET THE VALUES OF THE GYROSCOPE / ACCELEROMETER
-  PID_Regulator(); // RUN THE PID REGULATOR LOOP
-  MotorpulseCalculator(); // SEND DESIRED SPEED VALUES TO THE ESC (ELECTRONIC SPEED CONTROLLER)
-  while (micros() - motorPulseStopwatch < motor_pwm)
+  ToggleAutopilot(); // switch to desired operation mode
+  GetSensorValues(); // get the values of the gyroscope / accelerometer
+  PID_Regulator(); // run the pid regulator loop
+  MotorpulseCalculator(); // send desired speed values to the ESC (electronic speed controller)
+  while (micros() - motorPulseStopwatch < motorPwm)
   {
     // Wait until ESC pulse has the right length
   }

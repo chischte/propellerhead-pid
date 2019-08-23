@@ -1,20 +1,20 @@
-void MotorpulseCalculator() // ESC = ELECTRONIC SPEED CONTROLLER
+void MotorpulseCalculator() // ESC = electronic speed controller
 {
 
   //*****************************************************************************
-  // MANUAL MODE (CONTROLLING MOTOR SPEED BY HAND)
+  // MANUAL MODE (controlling motor speed by hand)
   //*****************************************************************************
   if (autopilot == false)
   {
-    motor_pwm = map(rpm_Max, 0, 1023, minPwmManual, maxPwm); // map the potentiometer to the usable range of the motorcontroller
+    motorPwm = map(rpmMax, 0, 1023, minPwmManual, maxPwm); // map the potentiometer to the usable range of the motorcontroller
   }
 
   //*****************************************************************************
-  // AUTOPILOT MODE (CONTROLLING MOTOR SPEED WITH THE PID REGULATOR)
+  // AUTOPILOT MODE (controlling motor speed with the pid regulator)
   //*****************************************************************************
   if (autopilot == true)
   {
-    motor_pwm = map(rpm_Sum, 0, rpm_Max, minPwmAutopilot, maxPwm); // map to the usable range of the motorcontroller
+    motorPwm = map(rpmSum, 0, rpmMax, minPwmAutopilot, maxPwm); // map to the usable range of the motorcontroller
     // setpoint = map(rpm_Max, 0, 1023, -70, 70);
     /*
      if (motor_pwm < 1250)
@@ -26,32 +26,30 @@ void MotorpulseCalculator() // ESC = ELECTRONIC SPEED CONTROLLER
   }
 
   //*****************************************************************************
-  // EMERGENCY MEASURES /SPEED LIMITS
+  // EMERGENCY MEASURES / SPEED LIMITS
   // to prevent fall over of the rig or fast crashing into the end stops
   //*****************************************************************************
 
-  if (gyroAngleCalibrated > 60 && motor_pwm > 1380) // limit motor speed if arm points upwards
+  if (gyroAngleCalibrated > 60 && motorPwm > 1380) // limit motor speed if arm points upwards
   {
-    motor_pwm = 1380;
+    motorPwm = 1380;
   }
   // EMERGENCY D-REGULATOR:
-   if (gyroAngularSpeed < speedlimitLow) // limit downward speed
+  if (gyroAngularSpeed < speedlimitLow) // limit downward speed
   {
     digitalWrite(ESC_PIN, LOW);
-    // motor_pwm = maxPwm;
-    // EMERGENCY D-REGULATOR:
+
     while (gyroAngularSpeed < speedlimitLow / 5)
-    //while (1 == 1)
     {
       motorPulseStopwatch = micros();
       digitalWrite(ESC_PIN, HIGH);
       cosinusFactor = cos((gyroAngleCalibrated) * (2 * 3.14) * 0.00277); // because the motor arm turns in a circle //0.00277~1/360
-      cosinusFactor = limiter(cosinusFactor, 0.1, 1); // to prevent very small values caused by vibrations
-      rpm_D = 350 * -0.1 * gyroAngularSpeedSmoothed * cosinusFactor; // first factor is to adjust the d-regulator
-      rpm_D = limiter(rpm_D, 0, rpm_Max);
-      motor_pwm = map(rpm_D, 0, rpm_Max, minPwmAutopilot, maxPwm);
+      cosinusFactor = Limiter(cosinusFactor, 0.1, 1); // to prevent very small values caused by vibrations
+      rpmD = 350 * -0.1 * gyroAngularSpeedSmoothed * cosinusFactor; // first factor is to adjust the d-regulator
+      rpmD = Limiter(rpmD, 0, rpmMax);
+      motorPwm = map(rpmD, 0, rpmMax, minPwmAutopilot, maxPwm);
       GetSensorValues();
-      while (micros() - motorPulseStopwatch < motor_pwm)
+      while (micros() - motorPulseStopwatch < motorPwm)
       {
         // Wait until ESC pulse has the right length
       }

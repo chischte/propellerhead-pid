@@ -9,93 +9,89 @@
  * *****************************************************************************
  */
 
-//*****************************************************************************
-//PRE-SETUP SECTION / PIN LAYOUT
-//*****************************************************************************
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_FXAS21002C.h>
 #include <Adafruit_FXOS8700.h>
-#define ESC_pin 2
-//*****************************************************************************
-//MPU_6050 ACCELEROMETER / GYROSCOPE
-//*****************************************************************************
-//I2C PINS:
-//CONNECT SDA TO A4
-//CONNECT SCL TO A5
-//CONNECT XDA TO D2 //in this case not required
-//*****************************************************************************
-//KNOBS AND POTENTIOMETERS
-//*****************************************************************************
-#define toggle_knob 4
-#define manual_throttle_pot A0 // potentiometer control motorspeed in manual mode
-#define p_valuepot A6
-#define i_valuepot A1
-#define d_valuepot A2
-//*****************************************************************************
-//DECLARATION OF VARIABLES / DATA TYPES
-//*****************************************************************************
-//boolean (true/false)
-//byte  (0-255)
-//int   (-32,768 to 32,767) / unsigned int: 0 to 65,535
-//long  (-2,147,483,648 to 2,147,483,647)
-//float (6-7 Digits)
-//*****************************************************************************
-boolean set_error_stopwatch_clearance = true;
-boolean autopilot = false;
-boolean pid_startupmode = true;
+#define ESC_PIN 2
 
-byte one_at_a_time = 1;
+//*****************************************************************************
+// MPU_6050 ACCELEROMETER / GYROSCOPE
+//*****************************************************************************
+// I2C PINS:
+// CONNECT SDA TO A4
+// CONNECT SCL TO A5
+// CONNECT XDA TO D2 //in this case not required
+//*****************************************************************************
+
+//*****************************************************************************
+// DECLARATION OF VARIABLES / DATA TYPES
+//*****************************************************************************
+// boolean (true/false)
+// byte (0-255)
+// int   (-32,768 to 32,767) / unsigned int: 0 to 65,535
+// long  (-2,147,483,648 to 2,147,483,647)
+// float (6-7 Digits)
+//*****************************************************************************
+
+// KNOBS AND POTENTIOMETERS:
+const byte TOGGLE_KNOB = 4;
+const byte MANUAL_THROTTLE_POT = A0 // potentiometer control motorspeed in manual mode
+const byte P_VALUE_POT = A6
+const byte I_VALUE_POT = A1
+const byte D_VALUE_POT = A2
+
+boolean autopilot = false;
+boolean pidStartupMode = true;
+
+byte oneAtATime = 1;
 
 int setpoint = 0; //setpoint of the regulator is 0° //value slightli adapted because of sensor alignment
-int speedlimit_low = -200; // set max downwards speed limit [°/s]
-int startup_counter; //to startup the esc needs a longer delay between the pulses
-int kp_max = 1500; //[RPM /(°/10)] value to scale the regulator potentiometer
-int kp_factor;
-int ki_max = 8000; //[RPM /(°/10)/s] value to scale the regulator potentiometer
-int ki_factor;
-int kd_max = 3000; //[RPM /((°/10)/s))] value to scale the regulator potentiometer
-int rpm_max = 10000; // just a rough guess
-int manual_throttle;
-int min_pwm_manual = 1200; // 1270 motor brake // 1282 motor start
-int min_pwm_autopilot = 1200;
-int max_pwm = 1540; //1450 sufficient // 1570 limit, faster sounds "unhealthy"
+int speedlimitLow = -200; // set max downwards speed limit [°/s]
+int Kp_Max = 1500; // [RPM /(°/10)] value to scale the regulator potentiometer
+int Kp_Factor;
+int Ki_Max = 8000; // [RPM /(°/10)/s] value to scale the regulator potentiometer
+int Ki_Factor;
+int Kd_Max = 3000; // [RPM /((°/10)/s))] value to scale the regulator potentiometer
+int rpm_Max = 10000; // just a rough guess
+int manualThrottle;
+int minPwmManual = 1200; // 1270 motor brake // 1282 motor start
+int minPwmAutopilot = 1200;
+int maxPwm = 1540; // 1450 sufficient // 1570 limit, faster sounds "unhealthy"
 unsigned int motor_pwm;
 
-//FOR ESC PROGRAMMING ONLY:
-//int min_pwm = 1000; // 1220 Motor off // 1245 motor start
-//int max_pwm = ESC_pwm_period;
+// FOR ESC PROGRAMMING ONLY:
+// int min_pwm = 1000; // 1220 Motor off // 1245 motor start
+// int maxPwm = ESC_pwm_period;
 
-long rpm_p;
-long rpm_i;
-float rpm_d;
-long rpm_sum;
+long rpm_P;
+long rpm_I;
+float rpm_D;
+long rpm_Sum;
 
-unsigned long cyclestopwatch;
-unsigned long serialprinttimer;
-unsigned long previoustime;
-unsigned long stabilizationtime;
-unsigned long transmission_stopwatch;
-unsigned long motorpulse_stopwatch;
-unsigned long timemarktimer;
-unsigned long transmission_delta_t;
-unsigned long pid_delta_t;
-unsigned long newtime;
+unsigned long cycleStopwatch;
+unsigned long serialPrintTimer;
+unsigned long previousTime;
+unsigned long transmissionStopwatch;
+unsigned long motorPulseStopwatch;
+unsigned long timeMarkTimer;
+unsigned long transmissionDeltaT;
+unsigned long pidDeltaT;
+unsigned long newTime;
 
-float acc_gravity_raw;
-float gravity_angle_lpf_new;
-float gyro_raw;
+float accGravityRaw;
+float gravityAngleLpfNew;
+float gyroRaw;
 float stopwatch = micros();
-float measured_angle;
-float gyro_angle;
-float gyro_angle_calibrated;
-float cosinus_factor;
-float gyro_angular_speed_smoothed;
-float kd_factor;
-float acc_gravity_lpf;
-float gravity_angle_lpf;
-float gyro_angular_speed;
-float angle_error;
+float gyroAngle;
+float gyroAngleCalibrated;
+float cosinusFactor;
+float gyroAngularSpeedSmoothed;
+float Kd_Factor;
+float accGravityLpf;
+float gravityAngleLpf;
+float gyroAngularSpeed;
+float angleError;
 
 //*****************************************************************************
 //******************######**#######*#######*#******#*######********************
@@ -107,12 +103,12 @@ float angle_error;
 void setup()
 {
   //***************************************************************************
-  //SETUP GYROSCOPE / ACCELEROMETER / MPU_6050
+  // SETUP GYROSCOPE / ACCELEROMETER / MPU_6050
   //***************************************************************************
 
-  //CONNECT SCL TO A5
-  //CONNECT SDA TO A4
-  //CONNECT XDA TO D2
+  // CONNECT SCL TO A5
+  // CONNECT SDA TO A4
+  // CONNECT XDA TO D2
   Adafruit_FXAS21002C gyro = Adafruit_FXAS21002C(0x0021002C);
   Adafruit_FXOS8700 accelmag = Adafruit_FXOS8700(0x8700A, 0x8700B);
 
@@ -132,20 +128,20 @@ void setup()
   }
 
   //***************************************************************************
-  //SETUP PID REGULATOR
+  // SETUP PID REGULATOR
   //***************************************************************************
-  pinMode(toggle_knob, INPUT_PULLUP);
-  pinMode(manual_throttle_pot, INPUT);
-  pinMode(p_valuepot, INPUT);
-  pinMode(i_valuepot, INPUT);
-  pinMode(d_valuepot, INPUT);
-  pinMode(ESC_pin, OUTPUT);
+  pinMode(TOGGLE_KNOB, INPUT_PULLUP);
+  pinMode(MANUAL_THROTTLE_POT, INPUT);
+  pinMode(P_VALUE_POT, INPUT);
+  pinMode(I_VALUE_POT, INPUT);
+  pinMode(D_VALUE_POT, INPUT);
+  pinMode(ESC_PIN, OUTPUT);
   //***************************************************************************
-  Serial.begin(115200);  //start serial connection
-  digitalWrite(ESC_pin, LOW);
+  Serial.begin(115200);  // start serial connection
+  digitalWrite(ESC_PIN, LOW);
   Serial.println("EXIT SETUP");
 }
-//*****************************************************************************
+
 //*****************************************************************************
 //********************#*********#####***#####***######*************************
 //********************#********#*****#*#*****#**#*****#************************
@@ -153,35 +149,34 @@ void setup()
 //********************#********#*****#*#*****#**#******************************
 //********************#######***#####***#####***#******************************
 //*****************************************************************************
-//*****************************************************************************
 
 void loop()
 {
 
   //***************************************************************************
-  //MAIN LOOP
+  // MAIN LOOP
   //***************************************************************************
 
-  motorpulse_stopwatch = micros();
-  digitalWrite(ESC_pin, HIGH);
-  toggle_autopilot(); //SWITCH TO DESIRED OPERATION MODE
-  get_sensor_values(); //GET THE VALUES OF THE GYROSCOPE / ACCELEROMETER
-  pid_regulator(); //RUN THE PID REGULATOR LOOP
-  motorpulse_calculator(); //SEND DESIRED SPEED VALUES TO THE ESC (ELECTRONIC SPEED CONTROLLER)
-  while (micros() - motorpulse_stopwatch < motor_pwm)
+  motorPulseStopwatch = micros();
+  digitalWrite(ESC_PIN, HIGH);
+  ToggleAutopilot(); // SWITCH TO DESIRED OPERATION MODE
+  GetSensorValues(); // GET THE VALUES OF THE GYROSCOPE / ACCELEROMETER
+  PID_Regulator(); // RUN THE PID REGULATOR LOOP
+  MotorpulseCalculator(); // SEND DESIRED SPEED VALUES TO THE ESC (ELECTRONIC SPEED CONTROLLER)
+  while (micros() - motorPulseStopwatch < motor_pwm)
   {
-    //Wait until ESC pulse has the right length
+    // Wait until ESC pulse has the right length
   }
-  digitalWrite(ESC_pin, LOW);
-  get_potentiometer_values();
+  digitalWrite(ESC_PIN, LOW);
+  GetPotentiometerValues();
 
   //***************************************************************************
-  //ACTIVATE / DEACTIVATE SERIAL PRINTS FOR MONITORING AND DEBUGGING
+  // ACTIVATE / DEACTIVATE SERIAL PRINTS FOR MONITORING AND DEBUGGING
   //***************************************************************************
   //serial_prints();
 
   //***************************************************************************
-  //STOPWATCH TO READ THE LENGTH OF A PROGRAMCYCLE
+  // STOPWATCH TO READ THE LENGTH OF A PROGRAMCYCLE
   //***************************************************************************
   /*
    long runtime = micros() - stopwatch;

@@ -161,7 +161,7 @@ void loop()
   digitalWrite(ESC_PIN, HIGH);
   ToggleAutopilot(); // switch to desired operation mode
   GetSensorValues(); // get the values of the gyroscope / accelerometer
-  PID_Regulator(); // run the pid regulator loop
+  PidRegulator(); // run the pid regulator loop
   MotorpulseCalculator(); // send desired speed values to the ESC (electronic speed controller)
   while (micros() - motorPulseStopwatch < motorPwm)
   {

@@ -1,4 +1,4 @@
-void PID_Regulator()
+void PidRegulator()
 {
   //*****************************************************************************
   // CALCULATION OF BASIC VARIABLES FOR THE REGULATOR

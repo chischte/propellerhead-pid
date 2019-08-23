@@ -1,4 +1,4 @@
-void get_potentiometer_values()
+void GetPotentiometerValues()
 {
   /*
    * *****************************************************************************
@@ -6,35 +6,35 @@ void get_potentiometer_values()
    * read only one pot per cycle (increase cycle speed)
    * *****************************************************************************
    */
-  switch (one_at_a_time)
-  //one analogRead per cycle is slow enough
+  switch (oneAtATime)
+  // one analogRead per cycle is slow enough
   {
   case 1:
-    kp_factor = analogRead(p_valuepot);
-    kp_factor = map(kp_factor, 0, 1023, 0, kp_max);
+    Kp_Factor = analogRead(P_VALUE_POT);
+    Kp_Factor = map(Kp_Factor, 0, 1023, 0, Kp_Max);
     break;
 
   case 2:
-    ki_factor = analogRead(i_valuepot);
-    if (ki_factor <= 1)
+    Ki_Factor = analogRead(I_VALUE_POT);
+    if (Ki_Factor <= 1)
     {
-      rpm_i = 0;  //reset i-value
+      rpm_I = 0;  // reset i-value
     }
-    ki_factor = map(ki_factor, 0, 1023, 0, ki_max);
+    Ki_Factor = map(Ki_Factor, 0, 1023, 0, Ki_Max);
     break;
 
   case 3:
-    kd_factor = analogRead(d_valuepot);
-    kd_factor = map(kd_factor, 0, 1023, 0, kd_max);
+    Kd_Factor = analogRead(D_VALUE_POT);
+    Kd_Factor = map(Kd_Factor, 0, 1023, 0, Kd_Max);
     break;
 
   case 4:
-    manual_throttle = analogRead(manual_throttle_pot);
+    rpm_Max = analogRead(rpm_Max_POT);
     break;
   }
-  one_at_a_time++;
-  if (one_at_a_time == 5)
+  oneAtATime++;
+  if (oneAtATime == 5)
   {
-    one_at_a_time = 1;
+    oneAtATime = 1;
   }
 }

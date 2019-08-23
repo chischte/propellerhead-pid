@@ -1,41 +1,41 @@
-void pid_regulator()
+void PID_Regulator()
 {
   //*****************************************************************************
-  //CALCULATION OF BASIC VARIABLES FOR THE REGULATOR
+  // CALCULATION OF BASIC VARIABLES FOR THE REGULATOR
   //*****************************************************************************
 
-  angle_error = (setpoint - gyro_angle_calibrated); //The setpoint of the regulator is 0° [°]
-  newtime = micros();
-  pid_delta_t = (newtime - previoustime);
-  previoustime = newtime;
+  angleError = (setpoint - gyroAngleCalibrated); // The setpoint of the regulator is 0° [°]
+  newTime = micros();
+  pidDeltaT = (newTime - previousTime);
+  previousTime = newTime;
 
   //*****************************************************************************
-  //CORE FORMULAS OF THE PID REGULATOR // LIMITATIONS
+  // CORE FORMULAS OF THE PID REGULATOR // LIMITATIONS
   //*****************************************************************************
 
-  cosinus_factor = cos((gyro_angle_calibrated) * (2 * 3.14) * 0.00277); //because the motor arm turns in a circle //0.00277~1/360
-  cosinus_factor = limiter(cosinus_factor, 0.1, 1); //to prevent very small values caused by vibrations
+  cosinusFactor = cos((gyroAngleCalibrated) * (2 * 3.14) * 0.00277); // because the motor arm turns in a circle // 0.00277~1/360
+  cosinusFactor = limiter(cosinusFactor, 0.1, 1); // to prevent very small values caused by vibrations
 
   //-----------------------------------------------------------------------------
-  rpm_p = kp_factor * angle_error * cosinus_factor;
-  rpm_i = rpm_i + angle_error * ki_factor * pid_delta_t * cosinus_factor * pow(10, -6);
-  rpm_d = kd_factor * -0.1 * gyro_angular_speed_smoothed * cosinus_factor; //reacts directly to the gyroscope
+  rpm_P = Kp_Factor * angleError * cosinusFactor;
+  rpm_I = rpm_I + angleError * Ki_Factor * pidDeltaT * cosinusFactor * pow(10, -6);
+  rpm_D = Kd_Factor * -0.1 * gyroAngularSpeedSmoothed * cosinusFactor; // reacts directly to the gyroscope
   //-----------------------------------------------------------------------------
 
-  rpm_p = limiter(rpm_p, -rpm_max, rpm_max); //(value to be limited, min value, max value)
-  rpm_i = limiter(rpm_i, -rpm_max, rpm_max);
-  rpm_d = limiter(rpm_d, -rpm_max, rpm_max);
+  rpm_P = limiter(rpm_P, -rpm_Max, rpm_Max); // (value to be limited, min value, max value)
+  rpm_I = limiter(rpm_I, -rpm_Max, rpm_Max);
+  rpm_D = limiter(rpm_D, -rpm_Max, rpm_Max);
 
   //-----------------------------------------------------------------------------
-  rpm_sum = rpm_p + rpm_i + rpm_d;
+  rpm_Sum = rpm_P + rpm_I + rpm_D;
   //-----------------------------------------------------------------------------
 
-  rpm_sum = limiter(rpm_sum, 0, rpm_max); //rpm_sum will be requested in the motorpulse calculator section
+  rpm_Sum = limiter(rpm_Sum, 0, rpm_Max); // rpm_Sum will be requested in the motorpulse calculator section
 
 }
 
 //*****************************************************************************
-//FUNCTION TO LIMIT REGULATOR VALUES
+// FUNCTION TO LIMIT REGULATOR VALUES
 //*****************************************************************************
 float limiter(float limited_value, float min_limit, float max_limit)
 {

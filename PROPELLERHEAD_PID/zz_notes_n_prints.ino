@@ -1,8 +1,8 @@
-void serial_prints()
+void SerialPrints()
 {
 
   /*V2
-   servo.h library replaced with self programme ESC-Motorcontroler
+   servo.h library replaced with self programmed ESC-Motorcontroler
 
    arduino stopped crashing often after changing the voltage supply from 5V (from the ESC)
    to 12V (from battery) to VIN, maybe the servo.h library would work now too.
@@ -10,7 +10,7 @@ void serial_prints()
    V3
    Code to map the PID potentiometer values exponentially removed, linear is better
 
-   Adding of a new value "min_pwm_autopilot" - in autopilot mode:
+   Adding of a new value "minPwmAutopilot" - in autopilot mode:
    the lowest possible RPM is now a slow rotation. This should make the regulation process a bit smoother
    because the propeller stays always under controll. (To be tested)
 
@@ -25,8 +25,8 @@ void serial_prints()
 
    A permanent active D-Regulator seems to work better than the emergency stop algorithm
 
-   //LET GYRO ANGLE DECAY AS SLOW AS POSSIBLE (IT IS NOW CALIBRATED TO 0 AFTER STARTUP)
-   //CHECK TO REPLACE ESC "PWM SIGNAL" WITH A "FIXED DELAY SIGNAL"
+   // LET GYRO ANGLE DECAY AS SLOW AS POSSIBLE (IT IS NOW CALIBRATED TO 0 AFTER STARTUP)
+   // CHECK TO REPLACE ESC "PWM SIGNAL" WITH A "FIXED DELAY SIGNAL"
 
    V5
    Gyro Angle will be set to 0 if PID Startup is at around 0°, therfore the Gyro Angle decay can stay small
@@ -82,40 +82,40 @@ void serial_prints()
    */
 
   //*****************************************************************************
-  //SPEED OPTIMIZATION
+  // SPEED OPTIMIZATION
   //*****************************************************************************
-  //RUNTIME WHOLE PROGRAM:
-  //2200 us in Manual mode
-  //2300 us in Autopilot mode
-  //1600 us (aproximately) and faster since V5
-  //motorcontroller:
+  // RUNTIME WHOLE PROGRAM:
+  // 2200 us in Manual mode
+  // 2300 us in Autopilot mode
+  // 1600 us (aproximately) and faster since V5
+  // motorcontroller:
   //*****************************************************************************
   //  164 us TIME FOR motorcontroller() //with and without serial.flush
   // 1740 us !!! (up to) because of ongoing interupt troubles and arduino crashes I
-  //finally decided to program a ESC-control without interrupts. I did not help and
-  //I lost over 1500us runtime! ...but also gained a much higher ESC actualisation rate
-  //because with the self-programmed code I was able to increase the ESC-PWM frequency
-  //and therefore the actualisation speed of the motor from 50Hz (SLOW!) to 550Hz(!)
-  //autopilot:
+  // finally decided to program a ESC-control without interrupts. I did not help and
+  // I lost over 1500us runtime! ...but also gained a much higher ESC actualisation rate
+  // because with the self-programmed code I was able to increase the ESC-PWM frequency
+  // and therefore the actualisation speed of the motor from 50Hz (SLOW!) to 550Hz(!)
+  // autopilot:
   //*****************************************************************************
   //   14 us TIME FOR toggle autopilot()
-  //get_sensor_values:
+  //GetSensorValues:
   //*****************************************************************************
   // 1750 us first measurement
   // 1580 us reduced by 170us by replacing divison with multiplication on several occasions
   // 1420 us reduced by another 160us by removing most of float math
-  //  700 us reduced by another 700us! with Wire.setClock(400000); //to speed up I2c from 100 to 400kHz
-  //pid_regulator
+  //  700 us reduced by another 700us! with Wire.setClock(400000); // to speed up I2c from 100 to 400kHz
+  // PID_Regulator
   //*****************************************************************************
-  //12000 us !? first measurement, without lcd print
-  // 300 us after bringing values in a reasonable range and reading only one AnalogRead per cycle
+  // 12000 us !? first measurement, without lcd print
+  //  300 us after bringing values in a reasonable range and reading only one AnalogRead per cycle
   //*****************************************************************************
+  
   //*****************************************************************************
-  //SERIAL PRINT SECTION
+  // SERIAL PRINT SECTION
   //*****************************************************************************
-  //*****************************************************************************
-
-  if (millis() - serialprinttimer > 50)
+  
+  if (millis() - serialPrintTimer > 50)
   {
     Serial.flush();
 
@@ -127,14 +127,14 @@ void serial_prints()
     Serial.print(",");
 
 
-    serialprinttimer = millis();
+    serialPrintTimer = millis();
     /*
-     //ADD A VISUAL "SPIKE" TO TE SERIALPRINTER
+     // ADD A VISUAL "SPIKE" TO TE SERIALPRINTER
      int timemarkrate = 1000;
-     if (millis() > timemarktimer)
+     if (millis() > timeMarkTimer)
      {
      Serial.print(50);
-     timemarktimer = millis() + timemarkrate;
+     timeMarkTimer = millis() + timemarkrate;
      }
      else
      {

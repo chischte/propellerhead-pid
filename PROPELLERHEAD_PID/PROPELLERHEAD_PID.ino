@@ -100,8 +100,7 @@ float angleError;
 //***********************#**#**********#****#******#*#*************************
 //*****************######***######*****#*****######**#*************************
 //*****************************************************************************
-void setup()
-{
+void setup() {
   //***************************************************************************
   // SETUP GYROSCOPE / ACCELEROMETER / MPU_6050
   //***************************************************************************
@@ -113,16 +112,14 @@ void setup()
   Adafruit_FXOS8700 accelmag = Adafruit_FXOS8700(0x8700A, 0x8700B);
 
   /* Initialise the sensor */
-  if (!gyro.begin())
-  {
+  if (!gyro.begin()) {
     /* There was a problem detecting the FXAS21002C ... check your connections */
     while (1)
       ;
   }
 
   /* Initialise the sensor */
-  if (!accelmag.begin(ACCEL_RANGE_4G))
-  {
+  if (!accelmag.begin(ACCEL_RANGE_4G)) {
     while (1)
       ;
   }
@@ -150,8 +147,7 @@ void setup()
 //********************#######***#####***#####***#******************************
 //*****************************************************************************
 
-void loop()
-{
+void loop() {
 
   //***************************************************************************
   // MAIN LOOP
@@ -163,8 +159,7 @@ void loop()
   GetSensorValues(); // get the values of the gyroscope / accelerometer
   PidRegulator(); // run the pid regulator loop
   MotorpulseCalculator(); // send desired speed values to the ESC (electronic speed controller)
-  while (micros() - motorPulseStopwatch < motorPwm)
-  {
+  while (micros() - motorPulseStopwatch < motorPwm) {
     // Wait until ESC pulse has the right length
   }
   digitalWrite(ESC_PIN, LOW);

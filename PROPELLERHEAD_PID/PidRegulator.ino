@@ -1,5 +1,4 @@
-void PidRegulator()
-{
+void PidRegulator() {
   //*****************************************************************************
   // CALCULATION OF BASIC VARIABLES FOR THE REGULATOR
   //*****************************************************************************
@@ -37,14 +36,11 @@ void PidRegulator()
 //*****************************************************************************
 // FUNCTION TO LIMIT REGULATOR VALUES
 //*****************************************************************************
-float Limiter(float limited_value, float min_limit, float max_limit)
-{
-  if (limited_value > max_limit)
-  {
+float Limiter(float limited_value, float min_limit, float max_limit) {
+  if (limited_value > max_limit) {
     limited_value = max_limit;
   }
-  if (limited_value < min_limit)
-  {
+  if (limited_value < min_limit) {
     limited_value = min_limit;
   }
   return limited_value;

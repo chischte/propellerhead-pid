@@ -1,5 +1,4 @@
-void GetPotentiometerValues()
-{
+void GetPotentiometerValues() {
   /*
    * *****************************************************************************
    * READ ALL POTENTIOMETERS AND CONVERT THEM INTO DIGITAL VALUES
@@ -16,8 +15,7 @@ void GetPotentiometerValues()
 
   case 2:
     KiFactor = analogRead(I_VALUE_POT);
-    if (KiFactor <= 1)
-    {
+    if (KiFactor <= 1) {
       rpmI = 0;  // reset i-value
     }
     KiFactor = map(KiFactor, 0, 1023, 0, KiMax);
@@ -33,8 +31,7 @@ void GetPotentiometerValues()
     break;
   }
   oneAtATime++;
-  if (oneAtATime == 5)
-  {
+  if (oneAtATime == 5) {
     oneAtATime = 1;
   }
 }

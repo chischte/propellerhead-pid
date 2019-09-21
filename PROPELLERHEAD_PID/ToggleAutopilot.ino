@@ -1,9 +1,7 @@
-void ToggleAutopilot()
-{
+void ToggleAutopilot() {
 
   // TOGGLE ON - SWITCH TO PID MODE:
-  if (digitalRead(TOGGLE_KNOB) == LOW && autopilot == false)
-  {
+  if (digitalRead(TOGGLE_KNOB) == LOW && autopilot == false) {
     pidStartupMode = true; // start PID with gyro angle turned off;
     autopilot = true;
     rpmP = 0;
@@ -16,8 +14,7 @@ void ToggleAutopilot()
   }
 
   // TOGGLE OFF - SWITCH TO MANUAL MODE:
-  if (digitalRead(TOGGLE_KNOB) == LOW && autopilot == true)
-  {
+  if (digitalRead(TOGGLE_KNOB) == LOW && autopilot == true) {
     autopilot = false;
     while (digitalRead(TOGGLE_KNOB) == LOW) // LOW=pushed // keep in loop until button is released
     {

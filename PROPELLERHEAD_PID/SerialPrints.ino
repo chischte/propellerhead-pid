@@ -1,10 +1,8 @@
-void SerialPrints()
-{
+void SerialPrints() {
   //*****************************************************************************
   // SERIAL PRINT SECTION
   //*****************************************************************************
-  if (millis() - serialPrintTimer > 50)
-  {
+  if (millis() - serialPrintTimer > 50) {
     Serial.flush();
 
     Serial.print(-85);
